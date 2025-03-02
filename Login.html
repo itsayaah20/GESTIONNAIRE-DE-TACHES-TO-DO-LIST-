@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion</title>
+<style>/* Import Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap');
+    
+    body {
+        font-family: 'Quicksand', sans-serif;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #74b9ff, #e66767, #fdcb6e);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    
+    /* Login Container */
+    .login-container {
+        background-color: #fff;
+        padding: 50px;
+        border-radius: 20px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        width: 100%;
+        max-width: 450px;
+        text-align: center;
+        animation: fadeIn 0.8s ease-in-out;
+    }
+    
+    /* Header Title */
+    h1 {
+    font-size: 40px;
+    color: #2d3436;
+    background: linear-gradient(45deg, #0984e3, #fdcb6e);
+    background-clip: text; /* Standard property */
+    -webkit-background-clip: text; /* WebKit-specific */
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+    
+    /* Form Styling */
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    /* Labels */
+    label {
+        margin: 10px 0 5px;
+        font-size: 16px;
+        color: #636e72;
+        font-weight: 600;
+    }
+    
+    /* Inputs */
+    input {
+        width: 100%;
+        padding: 14px;
+        margin-bottom: 20px;
+        border: 2px solid #dfe6e9;
+        border-radius: 12px;
+        font-size: 16px;
+        transition: border 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    input:focus {
+        border-color: #6c5ce7;
+        box-shadow: 0 8px 20px rgba(108, 92, 231, 0.2);
+        outline: none;
+    }
+    
+    /* Submit Button */
+    button {
+        width: 100%;
+        padding: 16px;
+        margin-top: 10px;
+        font-size: 18px;
+        font-weight: 600;
+        background: linear-gradient(135deg, #6c5ce7, #0984e3);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        box-shadow: 0 8px 30px rgba(108, 92, 231, 0.4);
+        transition: all 0.3s ease;
+    }
+    
+    button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(108, 92, 231, 0.5);
+    }
+    
+    /* Signup Link */
+    p {
+        margin-top: 20px;
+        color: #636e72;
+        font-size: 15px;
+    }
+    
+    a {
+        color: #6c5ce7;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+    
+    a:hover {
+        color: #0984e3;
+        text-decoration: underline;
+    }
+    
+    /* Fade In Animation */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+</style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Connexion</h1>
+        <form id="loginForm">
+            <label for="username">Nom d'utilisateur :</label>
+            <input type="text" id="username" required>
+            
+            <label for="password">Mot de passe :</label>
+            <input type="password" id="password" required>
+            
+            <button type="submit">Se Connecter</button>
+        </form>
+        <p>Pas encore de compte ? <a href="signup.html">Inscrivez-vous</a></p>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            const storedUser = JSON.parse(localStorage.getItem(username));
+            
+            if (storedUser && storedUser.password === password) {
+                alert("Connexion réussie !");
+                localStorage.setItem('currentUser', username);
+                window.location.href = 'dashboard.html';
+            } else {
+                alert("Nom d'utilisateur ou mot de passe incorrect !");
+            }
+        });
+    </script>
+</body>
+</html>
