@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Déconnexion</title>
+</head>
+<body>
+    <h2>Vous avez été déconnecté avec succès!</h2>
+    <p>Vous serez redirigé vers la page de connexion.</p>
+
+    <script>
+        // Clear the user's login information from localStorage
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('username'); // You can remove other items if needed
+
+        // Redirect the user to the login page after 2 seconds
+        setTimeout(function() {
+            window.location.href = 'login.html'; // Redirect to the login page
+        }, 2000); // 2-second delay before redirect
+    </script>
+</body>
+</html>
