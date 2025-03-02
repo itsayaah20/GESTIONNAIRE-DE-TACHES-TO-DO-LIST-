@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord des Tâches</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap');
+
+body {
+    font-family: 'Quicksand', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #74b9ff, #e66767, #fdcb6e);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    width: 90%;
+    max-width: 900px;
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+h1 {
+    font-size: 40px;
+    color: #2d3436;
+    background: linear-gradient(45deg, #0984e3, #fdcb6e);
+    background-clip: text; /* Standard property */
+    -webkit-background-clip: text; /* WebKit-specific */
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+form {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+input, select {
+    padding: 15px;
+    font-size: 16px;
+    border: 2px solid #dfe6e9;
+    border-radius: 12px;
+    flex: 1;
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+input:focus, select:focus {
+    border-color: #6c5ce7;
+    box-shadow: 0 8px 20px rgba(108, 92, 231, 0.2);
+    outline: none;
+}
+
+button {
+    padding: 15px 25px;
+    font-size: 18px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #6c5ce7, #0984e3);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(108, 92, 231, 0.4);
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(108, 92, 231, 0.5);
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    background-color: #f5f5f5;
+    padding: 20px;
+    margin: 10px 0;
+    border-radius: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    border-left: 6px solid #6c5ce7;
+}
+
+li.completed {
+    text-decoration: line-through;
+    opacity: 0.7;
+    border-left-color: #55efc4;
+}
+
+.priority {
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.haute {
+    background-color: #ff7675;
+    color: white;
+}
+
+.moyenne {
+    background-color: #fdcb6e;
+    color: white;
+}
+
+.basse {
+    background-color: #55efc4;
+    color: white;
+}
+
+.delete, .edit {
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    font-size: 20px;
+    color: #e74c3c;
+    margin-left: 10px;
+    transition: color 0.3s ease;
+}
+
+.edit {
+    color: #0984e3;
+}
+
+.delete:hover {
+    color: #d63031;
+}
+
+.edit:hover {
+    color: #74b9ff;
+}
+
+.logout {
+    margin-top: 30px;
+    display: block;
+    text-align: center;
+    padding: 12px 25px;
+    background: #e74c3c;
+    color: white;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: bold;
+    box-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);
+}
+
+.logout:hover {
+    background: #d63031;
+    box-shadow: 0 12px 35px rgba(231, 76, 60, 0.5);
+}
+
+/* Fade In Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+</style></head>
+<body>
+    <div class="container">
+        <h1>Gestionnaire de Tâches</h1>
+        <p id="welcome"></p>
+        <button onclick="logout()">Se Déconnecter</button>
+
+        <!-- Formulaire d'ajout/modification de tâche -->
+        <div class="task-form">
+            <h2>Ajouter une Tâche</h2>
+            <input type="text" id="task-name" placeholder="Nom de la tâche" required>
+            <input type="date" id="task-date" required>
+            <label for="task-priority">Priorité :</label>
+            <select id="task-priority">
+                <option value="Haute">Haute</option>
+                <option value="Moyenne" selected>Moyenne</option>
+                <option value="Basse">Basse</option>
+            </select>
+            <button onclick="addTask()">Ajouter</button>
+        </div>
+
+        <!-- Liste des Tâches -->
+        <div class="task-list">
+            <h2>Liste des Tâches</h2>
+            <ul id="task-list"></ul>
+        </div>
+    </div>
+
+<script>
+let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+let currentUser = localStorage.getItem('currentUser');
+let taskToEdit = null;
+
+if (!currentUser) {
+    window.location.href = 'login.html';
+}
+
+document.addEventListener('DOMContentLoaded', displayTasks);
+document.getElementById('welcome').innerText = `Bienvenue, ${currentUser}`;
+
+// Ajouter ou modifier une tâche
+function addTask() {
+    const taskName = document.getElementById('task-name').value;
+    const taskDate = document.getElementById('task-date').value;
+    const taskPriority = document.getElementById('task-priority').value;
+
+    if (taskName && taskDate) {
+        if (taskToEdit) {
+            // Modifier une tâche existante
+            taskToEdit.name = taskName;
+            taskToEdit.date = taskDate;
+            taskToEdit.priority = taskPriority;
+            taskToEdit = null;
+        } else {
+            // Ajouter une nouvelle tâche
+            const newTask = {
+                id: Date.now(),
+                name: taskName,
+                date: taskDate,
+                priority: taskPriority,
+                completed: false,
+                user: currentUser
+            };
+            tasks.push(newTask);
+        }
+
+        saveTasks();
+        displayTasks();
+        resetForm();
+    } else {
+        alert("Veuillez remplir tous les champs.");
+    }
+}
+
+// Remplir le formulaire pour modifier une tâche
+function editTask(id) {
+    taskToEdit = tasks.find(task => task.id === id);
+    if (taskToEdit) {
+        document.getElementById('task-name').value = taskToEdit.name;
+        document.getElementById('task-date').value = taskToEdit.date;
+        document.getElementById('task-priority').value = taskToEdit.priority;
+    }
+}
+
+// Réinitialiser le formulaire après ajout/modification
+function resetForm() {
+    document.getElementById('task-name').value = '';
+    document.getElementById('task-date').value = '';
+    document.getElementById('task-priority').value = 'Moyenne';
+    taskToEdit = null;
+}
+
+// Afficher les tâches triées
+function displayTasks() {
+    const taskList = document.getElementById('task-list');
+    taskList.innerHTML = '';
+
+    const userTasks = tasks.filter(task => task.user === currentUser);
+
+    userTasks.sort((a, b) => {
+        const priorityOrder = { 'Haute': 1, 'Moyenne': 2, 'Basse': 3 };
+        return priorityOrder[a.priority] - priorityOrder[b.priority] || new Date(a.date) - new Date(b.date);
+    });
+
+    userTasks.forEach(task => {
+        const li = document.createElement('li');
+        li.className = task.completed ? 'completed' : '';
+        li.innerHTML = `
+            <strong>${task.name}</strong> - ${task.date} 
+            <span class="priority ${task.priority.toLowerCase()}">${task.priority}</span>
+            <button onclick="toggleComplete(${task.id})">${task.completed ? 'Annuler' : 'Terminer'}</button>
+            <button onclick="editTask(${task.id})">Modifier</button>
+            <button onclick="deleteTask(${task.id})">Supprimer</button>
+        `;
+        taskList.appendChild(li);
+    });
+}
+
+// Terminer une tâche
+function toggleComplete(id) {
+    tasks = tasks.map(task => {
+        if (task.id === id) task.completed = !task.completed;
+        return task;
+    });
+    saveTasks();
+    displayTasks();
+}
+
+// Supprimer une tâche
+function deleteTask(id) {
+    tasks = tasks.filter(task => task.id !== id);
+    saveTasks();
+    displayTasks();
+}
+
+// Sauvegarde
+function saveTasks() {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+}
+
+// Déconnexion
+function logout() {
+    localStorage.removeItem('currentUser');
+    window.location.href = 'login.html';
+}
+
+    </script></body>
+</html>
